@@ -3,21 +3,41 @@
 # command to install #pip install uvicorn fastapi
 # or -m pip install uvicorn fastapi
 # or -m pip install uvicorn fastapi
-#NEXT_PUBLIC_SUPABASE_URL=https://njhtiupjivedbncsbkok.supabase.co
-#NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_n8DQJ9BZBbfIHxMJnj7WYw_HbA5nUk8
-SUPABASE_URL="https://nbqplffymgdlfmzokmzi.supabase.co"
-SUPABASE_KEY="sb_publishable_sHGG099DttuTDX7S9qWB7Q_cfsw85Yx"
+
+SUPABASE_URL="https://njhtiupjivedbncsbkok.supabase.co"
+SUPABASE_KEY="sb_publishable_n8DQJ9BZBbfIHxMJnj7WYw_HbA5nUk8"     
 
 # pip install supabase
 # pip install uvicorn fastapi
 # python -m pip install uvicorn fastapi
 # py -m pip install uvicorn fastapi
 
+
 from fastapi import FastAPI # importing FastAPI class
 from supabase import create_client
 fastapi_obj=FastAPI() # creating fastapi object
 supabase_obj=create_client(SUPABASE_URL,SUPABASE_KEY)
 
+@fastapi_obj.get("/get_my_courses")
+def get_my_courses_fun(t_id:str):
+    res=supabase_obj.table("courses").select("*").eq("trainer_id",t_id).execute()
+    return {
+
+"msg":"got yr courses records",
+"data":res.data
+    }
+    # select *
+# from courses 
+# where trainer_id = "a53738a9-3e62-4e8d-bcd4-911415f8530d"
+
+
+@fastapi_obj.post("/add_course")
+def add_course_fun(new_course:dict):
+    res_from_sup=supabase_obj.table("courses").insert(new_course).execute()
+    print(res_from_sup)
+    return {
+        "msg":"successfully added a new course"
+    }
 
 
 @fastapi_obj.post("/login")
@@ -29,7 +49,7 @@ def login_validation(login_cred_details:dict):
     incoming_login_role=login_cred_details["role"]
 
     response = supabase_obj.table("usera") \
-    .select("name,email,role") \
+    .select("id,name,email,role") \
     .eq("email", incoming_login_email) \
     .eq("password", incoming_login_password) \
     .eq("role", incoming_login_role) \
@@ -48,8 +68,6 @@ def login_validation(login_cred_details:dict):
         "loggedIn_user":response.data[0]
     }
 
-
-
 @fastapi_obj.post("/register")
 def user_registration(new_user:dict): # type annotation
     print("reg function")
@@ -61,11 +79,4 @@ def user_registration(new_user:dict): # type annotation
         "data":res.data
     }
 
-# how to start be server ?
 
-# uvicorn main:fastapi_obj --reload
-
-
-# select *
-# from users
-# where email ="" and password="" and role=""

@@ -33,26 +33,48 @@ with t1:
 
             res_from_sup_for_login=requests.post("http://127.0.0.1:8000/login",json=login_cred_details)
 
-            # st.write(res_from_sup_for_login)
             if res_from_sup_for_login.status_code == 200:
-                st.write(res_from_sup_for_login.json())
-                r_data=res_from_sup_for_login.json()
-                st.session_state["status"] =True
-                st.session_state["name"]=r_data["loggedIn_user"]["name"]
-                st.session_state["role"]=r_data["loggedIn_user"]["role"]
-                st.session_state["email"]=r_data["loggedIn_user"]["email"]
+                r_data = res_from_sup_for_login.json()
 
-                if st.session_state["status"] :
-                    if st.session_state["role"] =="trainer":
+                if r_data.get("status") == True:
+                    st.session_state["status"] = True
+                    st.session_state["name"] = r_data["loggedIn_user"]["name"]
+                    st.session_state["role"] = r_data["loggedIn_user"]["role"]
+                    st.session_state["email"] = r_data["loggedIn_user"]["email"]
+                    st.session_state["id"] = r_data["loggedIn_user"]["id"]
+
+                    if st.session_state["role"] == "trainer":
                         st.switch_page("pages/TrainerDashboard.py")
 
-                    if st.session_state["role"] == "student":
+                    elif st.session_state["role"] == "student":
                         st.switch_page("pages/StudentDashboard.py")
+
+            else:
+                st.error(r_data.get("msg", "Invalid credentials"))
+
+            # else:
+            #     st.error("Some error occurred")
+            # st.write(res_from_sup_for_login)
+            # if res_from_sup_for_login.status_code == 200:
+            #     st.write(res_from_sup_for_login.json())
+            #     r_data=res_from_sup_for_login.json()
+            #     st.session_state["status"] =True
+            #     st.session_state["name"]=r_data["loggedIn_user"]["name"]
+            #     st.session_state["role"]=r_data["loggedIn_user"]["role"]
+            #     st.session_state["email"]=r_data["loggedIn_user"]["email"]
+            #     st.session_state["id"]=r_data["loggedIn_user"]["id"]
+
+            #     if st.session_state["status"] :
+            #         if st.session_state["role"] =="trainer":
+            #             st.switch_page("pages/TrainerDashboard.py")
+
+            #         if st.session_state["role"] == "student":
+            #             st.switch_page("pages/StudentDashboard.py")
                         
                     
                     
-            else:
-                st.write("some error occured")    
+            # else:
+            #     st.write("some error occured")    
 
 
 with t2:
@@ -92,7 +114,16 @@ with t2:
             res=requests.post("http://127.0.0.1:8000/register",json=new_user)
 
             if res.status_code == 200:
-                st.write(res.json())
-            else:
-                st.write("some error occured")    
 
+                st.success("Registration successful!")
+                st.write(res.json())
+
+            else:
+
+                st.error(f"Registration failed: {res.status_code}")
+                st.write(res.text)
+
+            # if res.status_code == 200:
+            #     st.write(res.json())
+            # else:
+            #     st.write("some error occured")    
